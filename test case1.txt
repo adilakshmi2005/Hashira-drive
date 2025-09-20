@@ -1,0 +1,50 @@
+public class HashiraAssignment {
+    // Function to compute Lagrange interpolation at x = 0
+    public static double lagrangeInterpolation(int[] x, long[] y, int k) {
+        double result = 0.0;
+
+        for (int i = 0; i < k; i++) {
+            double term = y[i]; // Start with y[i]
+
+            for (int j = 0; j < k; j++) {
+                if (i != j) {
+                    term *= (0.0 - x[j]) * 1.0 / (x[i] - x[j]);
+                }
+            }
+            result += term;
+        }
+        return result;
+    }
+
+    public static void main(String[] args) {
+        int n = 4;
+        int k = 3;
+
+        // Roots given in the JSON
+        int[] x = {1, 2, 3, 6}; // keys
+        String[][] data = {
+            {"10", "4"},     // -> 4
+            {"2", "111"},    // -> 7
+            {"10", "12"},    // -> 12
+            {"4", "213"}     // -> 39
+        };
+
+        long[] y = new long[n];
+        for (int i = 0; i < n; i++) {
+            int base = Integer.parseInt(data[i][0]);
+            String valueStr = data[i][1];
+            y[i] = Long.parseLong(valueStr, base);
+        }
+
+        // Use only first k points to reconstruct polynomial
+        int[] xSubset = new int[k];
+        long[] ySubset = new long[k];
+        for (int i = 0; i < k; i++) {
+            xSubset[i] = x[i];
+            ySubset[i] = y[i];
+        }
+
+        double secret = lagrangeInterpolation(xSubset, ySubset, k);
+        System.out.println("The secret constant (f(0)) = " + Math.round(secret));
+    }
+}

@@ -1,0 +1,70 @@
+import java.math.BigInteger;
+import java.util.*;
+
+public class PolynomialConstant {
+    // Convert string in given base to BigInteger (decimal)
+    static BigInteger toDecimal(String value, int base) {
+        return new BigInteger(value, base);
+    }
+
+    // Compute constant term c using Lagrange interpolation at x=0
+    static BigInteger findConstant(int[] xs, BigInteger[] ys, int k) {
+        BigInteger c = BigInteger.ZERO;
+        for (int i = 0; i < k; i++) {
+            // Li(0) = product over j!=i of (0 - xj) / (xi - xj)
+            BigInteger num = BigInteger.ONE;
+            BigInteger den = BigInteger.ONE;
+            for (int j = 0; j < k; j++) {
+                if (i == j) continue;
+                num = num.multiply(BigInteger.valueOf(-xs[j]));
+                den = den.multiply(BigInteger.valueOf(xs[i] - xs[j]));
+            }
+            // term = yi * num/den
+            BigInteger term = ys[i].multiply(num).divide(den);
+            c = c.add(term);
+        }
+        return c;
+    }
+
+    public static void main(String[] args) {
+        // ---------- Test Case 1 ----------
+        int n1 = 4, k1 = 3;
+        int[] xs1 = {1, 2, 3, 6};
+        String[][] roots1 = {
+            {"10", "4"},
+            {"2", "111"},
+            {"10", "12"},
+            {"4", "213"}
+        };
+
+        BigInteger[] ys1 = new BigInteger[xs1.length];
+        for (int i = 0; i < xs1.length; i++) {
+            ys1[i] = toDecimal(roots1[i][1], Integer.parseInt(roots1[i][0]));
+        }
+        BigInteger c1 = findConstant(xs1, ys1, k1);
+        System.out.println("Test Case 1: c = " + c1);
+
+        // ---------- Test Case 2 ----------
+        int n2 = 10, k2 = 7;
+        int[] xs2 = {1,2,3,4,5,6,7,8,9,10};
+        String[][] roots2 = {
+            {"6",  "13444211440455345511"},
+            {"15", "aed7015a346d635"},
+            {"15", "6aeeb69631c227c"},
+            {"16", "e1b5e05623d881f"},
+            {"8",  "316034514573652620673"},
+            {"3",  "2122212201122002221120200210011020220200"},
+            {"3",  "20120221122211000100210021102001201112121"},
+            {"6",  "20220554335330240002224253"},
+            {"12", "45153788322a1255483"},
+            {"7",  "1101613130313526312514143"}
+        };
+
+        BigInteger[] ys2 = new BigInteger[xs2.length];
+        for (int i = 0; i < xs2.length; i++) {
+            ys2[i] = toDecimal(roots2[i][1], Integer.parseInt(roots2[i][0]));
+        }
+        BigInteger c2 = findConstant(xs2, ys2, k2);
+        System.out.println("Test Case 2: c = " + c2);
+    }
+}

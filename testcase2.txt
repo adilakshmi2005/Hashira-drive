@@ -1,0 +1,66 @@
+import java.math.BigInteger;
+
+public class PolynomialConstant {
+    // Convert base string to BigInteger
+    static BigInteger toDecimal(String value, int base) {
+        return new BigInteger(value, base);
+    }
+
+    // Lagrange interpolation at x = 0
+    static BigInteger lagrangeAtZero(int[] xs, BigInteger[] ys, int k) {
+        BigInteger result = BigInteger.ZERO;
+
+        for (int i = 0; i < k; i++) {
+            // numerator and denominator for the basis polynomial
+            BigInteger num = BigInteger.ONE;
+            BigInteger den = BigInteger.ONE;
+
+            for (int j = 0; j < k; j++) {
+                if (i == j) continue;
+                num = num.multiply(BigInteger.valueOf(-xs[j])); // (0 - xj)
+                den = den.multiply(BigInteger.valueOf(xs[i] - xs[j]));
+            }
+
+            // yi * (num/den)
+            BigInteger term = ys[i].multiply(num).divide(den);
+            result = result.add(term);
+        }
+        return result;
+    }
+
+    public static void main(String[] args) {
+        int n = 10, k = 7;
+        int[] xs = {1,2,3,4,5,6,7,8,9,10};
+
+        String[][] roots = {
+            {"6",  "13444211440455345511"},
+            {"15", "aed7015a346d635"},
+            {"15", "6aeeb69631c227c"},
+            {"16", "e1b5e05623d881f"},
+            {"8",  "316034514573652620673"},
+            {"3",  "2122212201122002221120200210011020220200"},
+            {"3",  "20120221122211000100210021102001201112121"},
+            {"6",  "20220554335330240002224253"},
+            {"12", "45153788322a1255483"},
+            {"7",  "1101613130313526312514143"}
+        };
+
+        BigInteger[] ys = new BigInteger[n];
+        for (int i = 0; i < n; i++) {
+            int base = Integer.parseInt(roots[i][0]);
+            String value = roots[i][1];
+            ys[i] = toDecimal(value, base);
+        }
+
+        // Use first k points
+        int[] xSubset = new int[k];
+        BigInteger[] ySubset = new BigInteger[k];
+        for (int i = 0; i < k; i++) {
+            xSubset[i] = xs[i];
+            ySubset[i] = ys[i];
+        }
+
+        BigInteger secret = lagrangeAtZero(xSubset, ySubset, k);
+        System.out.println("Constant term c = " + secret);
+    }
+}
